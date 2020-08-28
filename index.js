@@ -15,6 +15,9 @@ app.get('/', (req, res) => {
     res.send('API of E-commerce')
 })
 
+app.use('/api/v1/login', require('./routes/v1/login-route'));
+app.use('/api/v1/users', require('./routes/v1/user-route'));  
+
 app.listen(port, '0.0.0.0', () => {
     console.log('server is ready in port ', port);
 })
