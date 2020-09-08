@@ -1,6 +1,5 @@
 const User = require('../../models/Users');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 exports.createUser = async (req, res) => {
 
@@ -14,15 +13,27 @@ exports.createUser = async (req, res) => {
         }
 
         // crear usuario con los datos enviados
-        user = new User(req.body);
+        const databody = JSON.parse(JSON.stringify(req.body)); 
+
+        const users = new User();
+        users.name = databody.name;
+        users.lastname = databody.lastname;
+        users.email = databody.email;
+        users.cellphone = databody.cellphone;
 
         // encriptar clave
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
+        users.password = await bcrypt.hash(password, salt);
+        
+        console.log('datos del usuario: ', users)
+        // console.log('datos del body', databody);
 
-        await user.save();
+        console.log('datos del file', req.file);
+
+        // await user.save();
 
         res.json({ msg: 'Usuario agregado exitosamente' });
+
         
     } catch (error) {
         res.status(400).json({ status: 'Error', msg: 'Error de servidor'})
@@ -31,7 +42,7 @@ exports.createUser = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     try {
-        const users = await User.find().select({ _id: 0, __v: 0, date: 0, password: 0}).sort({ date: -1});
+        const users = await User.find().select({ __v: 0, date: 0, password: 0}).sort({ date: -1});
         res.json({ users });
 
     } catch (error) {

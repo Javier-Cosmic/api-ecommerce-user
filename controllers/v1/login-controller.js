@@ -29,11 +29,11 @@ exports.loginAuth = async (req, res) => {
         }
 
         jwt.sign(payload, process.env.SECRET, {
-            expiresIn: 3000
+            expiresIn: '15m'
 
         }, (error, token) => {
             if (error) throw error; 
-                
+
                 res.json({ token })
             }
         );
@@ -45,7 +45,7 @@ exports.loginAuth = async (req, res) => {
 
 exports.userIsAuth = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(req.user.id).select({ _id: 0, __v: 0, date: 0, password: 0});
         res.json({ user });
 
     } catch (error) {

@@ -8,9 +8,12 @@ const port = process.env.PORT || 2020;
 const app = express();
 connectionDB();
 
+// middlewares
 app.use(cors());
 app.use(express.json({ extended: true }));
+app.use(express.urlencoded({ extended: false }))
 
+// ruta x defecto
 app.get('/', (req, res) => {
     res.send('API of E-commerce')
 })
