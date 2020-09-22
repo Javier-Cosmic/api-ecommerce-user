@@ -29,7 +29,7 @@ exports.loginAuth = async (req, res) => {
         }
 
         jwt.sign(payload, process.env.SECRET, {
-            expiresIn: '15m'
+            expiresIn: '1h'
 
         }, (error, token) => {
             if (error) throw error; 
@@ -39,13 +39,13 @@ exports.loginAuth = async (req, res) => {
         );
 
     } catch (error) {
-        res.status(400).json({ status: 'Error', msg: 'Error de servidor'})
+        res.status(500).json({ status: 'Error', msg: 'Error de servidor'})
     }
 }
 
 exports.userIsAuth = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select({ _id: 0, __v: 0, date: 0, password: 0});
+        const user = await User.findById(req.user.id).select({__v: 0, date: 0, password: 0, image_id: 0});
         res.json({ user });
 
     } catch (error) {

@@ -19,7 +19,8 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1/login', require('./routes/v1/login-route'));
-app.use('/api/v1/users', require('./routes/v1/user-route'));  
+app.use('/api/v1/users', require('./routes/v1/user-route')); 
+app.use('/api/v1/products', require('./routes/v1/product-route')); 
 
 app.listen(port, '0.0.0.0', () => {
     console.log('server is ready in port ', port);
