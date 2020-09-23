@@ -15,7 +15,7 @@ exports.createUser = async (req, res) => {
  
     try {
         const databody = JSON.parse(JSON.stringify(req.body));
-        // crear usuario con los datos enviados
+
         const { name, lastname, cellphone } = databody;
 
         if (
@@ -46,7 +46,7 @@ exports.createUser = async (req, res) => {
             });
         }
 
-        //cloudinary subir imagen
+        // //cloudinary subir imagen
         const resultImg = await cloudinary.v2.uploader.upload(req.file.path, {
             folder: '/photo-users',
         });
@@ -68,6 +68,7 @@ exports.createUser = async (req, res) => {
         await fs.unlink(req.file.path);
 
     } catch (error) {
+   
         res.status(500).json({ status: 'Error', msg: 'Error de servidor' });
     }
 };
@@ -78,7 +79,9 @@ exports.getUser = async (req, res) => {
             .select({ __v: 0, date: 0, password: 0, image_id: 0 })
             .sort({ date: -1 });
         res.json({ users });
+
     } catch (error) {
+        
         res.status(500).json({ status: 'Error', msg: 'Error de servidor' });
     }
 };

@@ -1,4 +1,5 @@
 const Products = require('../../models/Products');
+const Users = require('../../models/Users');
 const cloudinary = require('cloudinary');
 const fs = require('fs-extra');
 
@@ -9,26 +10,33 @@ cloudinary.config({
 });
 
 exports.createProduct = async (req, res) => {
-    
     const datafront = JSON.parse(JSON.stringify(req.body));
-    const user = datafront.userid;
+    const id = datafront.userid;
 
     try {
-        const {name, price, description, category, brand, stock} = JSON.parse(datafront.product);
+        const { name, price, description, category, brand, stock } = JSON.parse(
+            datafront.product
+        );
 
-        const userid = await Products.findOne({ user });
+        const user = await Users.findOne({ _id: id });
 
-        if (!userid) {
-            return res.status(400).json({ status: 'Error', msg: 'El usuario no existe'});
+        if (!user) {
+            return res
+                .status(400)
+                .json({ status: 'Error', msg: 'El usuario no existe' });
         }
 
         // verificar si corresponde al user autenticado
-        if (userid.user.toString() !== req.user.id ) {
-            return res.status(401).json({ status: 'Error', msg: 'No autorizado'})
+        if (user._id.toString() !== req.user.id) {
+            return res
+                .status(401)
+                .json({ status: 'Error', msg: 'No autorizado' });
         }
 
         if (!req.file) {
-            return res.status(400).json({ status: 'Error', msg: 'Debes subir una imagen' });
+            return res
+                .status(400)
+                .json({ status: 'Error', msg: 'Debes subir una imagen' });
         }
 
         //cloudinary subir imagen
@@ -45,24 +53,66 @@ exports.createProduct = async (req, res) => {
             stock,
             user: datafront.userid,
             image_url: resultImg.secure_url,
-            image_id: resultImg.public_id
+            image_id: resultImg.public_id,
         });
 
-        await product.save()
+        await product.save();
 
-        res.json({ msg: 'Producto agregado', product});
+        res.json({ msg: 'Producto agregado', product });
 
         await fs.unlink(req.file.path);
+    } catch (error) {
+      
+        res.status(500).json({
+            status: 'Error',
+            msg: 'Hubo un error de servidor',
+        });
+    }
+};
+
+exports.showProducts = async (req, res) => {
+    try {
+        const products = await Products.find()
+            .select({ __v: 0, date: 0, image_id: 0 })
+            .sort({ date: -1 });
+
+        res.json({ products });
 
     } catch (error) {
-        res.status(500).json({ status: 'Error', msg: 'Hubo un error de servidor.'})
+
+        res.status(500).json({
+            status: 'Error',
+            msg: 'Hubo un error de servidor',
+        });
     }
-} 
+};
 
-exports.showProducts = (req, res) => {
-    console.log('desde show products');
-} 
+exports.deleteProducts = async (req, res) => {
+    try {
+        const product = await Products.findById(req.params.id);
+        if (!product) {
+            return res
+                .status(404)
+                .json({ status: 'Error', msg: 'No existe ese producto' });
+        }
 
-exports.deleteProducts = (req, res) => {
-    console.log('desde delete products');
-}
+        // verificar si corresponde al user autenticado
+        if (product.user.toString() !== req.user.id) {
+            return res
+                .status(401)
+                .json({ status: 'Error', msg: 'No autorizado' });
+        }
+
+        await Products.findOneAndRemove({ _id: req.params.id })
+        await cloudinary.v2.uploader.destroy(product.image_id);
+        
+        res.json({ msg: 'Producto eliminado'})
+
+    } catch (error) {
+       
+        res.status(500).json({
+            status: 'Error',
+            msg: 'Hubo un error de servidor',
+        });
+    }
+};
