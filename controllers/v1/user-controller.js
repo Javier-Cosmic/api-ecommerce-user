@@ -68,7 +68,7 @@ exports.createUser = async (req, res) => {
         await fs.unlink(req.file.path);
 
     } catch (error) {
-   
+        console.log(error)
         res.status(500).json({ status: 'Error', msg: 'Error de servidor' });
     }
 };
@@ -81,7 +81,7 @@ exports.getUser = async (req, res) => {
         res.json({ users });
 
     } catch (error) {
-        
+        console.log(error)
         res.status(500).json({ status: 'Error', msg: 'Error de servidor' });
     }
 };
@@ -178,6 +178,7 @@ exports.deleteUser = async (req, res) => {
 
         res.json({ msg: 'Usuario eliminado' });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ status: 'Error', msg: 'Error de servidor' });
     }
 };

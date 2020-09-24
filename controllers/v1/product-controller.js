@@ -62,7 +62,7 @@ exports.createProduct = async (req, res) => {
 
         await fs.unlink(req.file.path);
     } catch (error) {
-      
+        console.log(error)
         res.status(500).json({
             status: 'Error',
             msg: 'Hubo un error de servidor',
@@ -79,7 +79,7 @@ exports.showProducts = async (req, res) => {
         res.json({ products });
 
     } catch (error) {
-
+        console.log(error)
         res.status(500).json({
             status: 'Error',
             msg: 'Hubo un error de servidor',
@@ -109,7 +109,7 @@ exports.deleteProducts = async (req, res) => {
         res.json({ msg: 'Producto eliminado'})
 
     } catch (error) {
-       
+        console.log(error)
         res.status(500).json({
             status: 'Error',
             msg: 'Hubo un error de servidor',
